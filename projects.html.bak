@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目 - DAYSOFF建筑事务所</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DIN+Condensed:wght@200;300;400&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'DIN Condensed', 'Microsoft YaHei', sans-serif;
+            font-size: 18px;
+            letter-spacing: 0.02em;
+            line-height: 1.6;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.6s ease;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 200;
+            letter-spacing: 0.2em;
+            color: #fff;
+            text-transform: uppercase;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 40px 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: padding 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+        }
+
+        .header.scrolled {
+            padding: 24px 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 32px;
+            transform: translateY(0);
+            transition: transform 0.3s ease, margin 0.3s ease;
+        }
+
+        .header.scrolled .logo-container {
+            margin-bottom: 20px;
+            transform: translateY(-2px);
+        }
+
+        .logo {
+            font-size: 2.8rem;
+            font-weight: 200;
+            letter-spacing: 0.25em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            transition: font-size 0.3s ease, letter-spacing 0.3s ease;
+        }
+
+        .header.scrolled .logo {
+            font-size: 2.2rem;
+            letter-spacing: 0.22em;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0 4px;
+        }
+
+        .subtitle::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            width: 24px;
+            height: 1px;
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-50%);
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .header.scrolled .subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            color: rgba(255,255,255,0.75);
+        }
+
+        .header.scrolled .subtitle::after {
+            width: 18px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav {
+            display: flex;
+            gap: 48px;
+            position: relative;
+        }
+
+        .nav::before, .nav::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 32px;
+            height: 1px;
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-50%);
+            transition: width 0.3s ease;
+        }
+
+        .nav::before {
+            left: -48px;
+        }
+
+        .nav::after {
+            right: -48px;
+        }
+
+        .header.scrolled .nav::before,
+        .header.scrolled .nav::after {
+            width: 24px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 4px 2px;
+        }
+
+        .nav a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255,255,255,0);
+            transform: scaleX(0);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: rgba(255,255,255,1);
+        }
+
+        .nav a:hover::before {
+            background: rgba(255,255,255,0.4);
+            transform: scaleX(1);
+        }
+
+        .nav a.active {
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .nav a.active::before {
+            background: rgba(255,255,255,0.6);
+            transform: scaleX(1);
+        }
+
+        .main-content {
+            padding-top: 200px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            padding: 200px 40px 80px;
+            max-width: 2000px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .projects-grid.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-item {
+            position: relative;
+            grid-column: span 6;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .project-item:nth-child(4n+1),
+        .project-item:nth-child(4n+4) {
+            grid-column: span 8;
+        }
+
+        .project-item:nth-child(4n+2),
+        .project-item:nth-child(4n+3) {
+            grid-column: span 4;
+        }
+
+        .project-item.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            color: #fff;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .project-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: opacity 0.8s ease, transform 1.2s ease;
+        }
+
+        .project-image.loaded {
+            opacity: 0.8;
+            transform: scale(1);
+        }
+
+        .project-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 40px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.6s ease, opacity 0.6s ease;
+        }
+
+        .project-link:hover .project-image {
+            opacity: 0.6;
+            transform: scale(1.05);
+        }
+
+        .project-link:hover .project-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .project-meta {
+            font-size: 0.85rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .project-meta::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 24px;
+            height: 1px;
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-50%);
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            font-weight: 200;
+            letter-spacing: 0.1em;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .project-desc {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 0.05em;
+            line-height: 1.6;
+            max-width: 480px;
+        }
+
+        @media (max-width: 1400px) {
+            .projects-grid {
+                padding: 0 60px;
+                gap: 30px;
+            }
+
+            .project-item:nth-child(n) {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .projects-grid {
+                padding: 160px 30px 60px;
+                gap: 15px;
+            }
+
+            .project-item:nth-child(n) {
+                grid-column: span 12;
+            }
+
+            .project-content {
+                padding: 30px;
+            }
+
+            .project-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 28px 0;
+            }
+            
+            .header.scrolled {
+                padding: 20px 0;
+            }
+
+            .logo {
+                font-size: 2rem;
+                letter-spacing: 0.2em;
+            }
+
+            .header.scrolled .logo {
+                font-size: 1.8rem;
+                letter-spacing: 0.18em;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                letter-spacing: 0.22em;
+            }
+
+            .header.scrolled .subtitle {
+                font-size: 0.8rem;
+                letter-spacing: 0.2em;
+            }
+
+            .nav {
+                gap: 32px;
+            }
+
+            .nav::before, .nav::after {
+                width: 24px;
+            }
+
+            .nav::before {
+                left: -32px;
+            }
+
+            .nav::after {
+                right: -32px;
+            }
+
+            .header.scrolled .nav::before,
+            .header.scrolled .nav::after {
+                width: 18px;
+            }
+
+            .nav a {
+                font-size: 0.85rem;
+                letter-spacing: 0.15em;
+            }
+
+            .main-content {
+                padding-top: 160px;
+            }
+
+            .projects-grid {
+                padding: 140px 20px 40px;
+                gap: 10px;
+            }
+
+            .project-content {
+                padding: 24px;
+            }
+
+            .project-title {
+                font-size: 1.4rem;
+            }
+
+            .project-desc {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen">
+        <div class="loading-text">LOADING</div>
+    </div>
+
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo">DAYSOFF</div>
+            <div class="subtitle">建筑事务所</div>
+        </div>
+        <nav class="nav">
+            <a href="index.html">首页</a>
+            <a href="projects.html">项目</a>
+            <a href="about.html">关于我们</a>
+            <a href="contact.html">联系我们</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="projects-grid">
+            <div class="project-item">
+                <a href="commercial-01.html" class="project-link">
+                    <img class="project-image" data-src="01/01.jpg" alt="ARO香水酒吧">
+                    <div class="project-content">
+                        <div class="project-meta">商业空间</div>
+                        <div class="project-title">ARO香水酒吧</div>
+                        <div class="project-desc">位于杭州的精致酒吧空间，将现代设计美学与休闲氛围完美融合</div>
+                    </div>
+                </a>
+            </div>
+            <div class="project-item">
+                <a href="commercial-02.html" class="project-link">
+                    <img class="project-image" data-src="02/01.jpg" alt="CUTO清吧">
+                    <div class="project-content">
+                        <div class="project-meta">商业空间</div>
+                        <div class="project-title">CUTO清吧</div>
+                        <div class="project-desc">精致小空间里的慢生活体验</div>
+                    </div>
+                </a>
+            </div>
+            <div class="project-item">
+                <a href="commercial-03.html" class="project-link">
+                    <img class="project-image" data-src="03/01.jpg" alt="Day Day Off">
+                    <div class="project-content">
+                        <div class="project-meta">咖啡空间</div>
+                        <div class="project-title">Day Day Off</div>
+                        <div class="project-desc">164平米的咖啡空间</div>
+                    </div>
+                </a>
+            </div>
+            <div class="project-item">
+                <a href="commercial-04.html" class="project-link">
+                    <img class="project-image" data-src="04/01.jpg" alt="丘末茶叶工坊">
+                    <div class="project-content">
+                        <div class="project-meta">产研空间</div>
+                        <div class="project-title">丘末茶叶工坊</div>
+                        <div class="project-desc">453平米的产研展示空间</div>
+                    </div>
+                </a>
+            </div>
+            <div class="project-item">
+                <a href="commercial-05.html" class="project-link">
+                    <img class="project-image" data-src="05/01.jpg" alt="田园度假屋">
+                    <div class="project-content">
+                        <div class="project-meta">度假空间</div>
+                        <div class="project-title">田园度假屋</div>
+                        <div class="project-desc">270平米的诗意栖居空间</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingScreen = document.querySelector('.loading-screen');
+            const projectsGrid = document.querySelector('.projects-grid');
+            const projectItems = document.querySelectorAll('.project-item');
+            const projectImages = document.querySelectorAll('.project-image');
+            
+            let loadedImages = 0;
+            const totalImages = projectImages.length;
+
+            // 优化的图片加载函数
+            function loadImage(img) {
+                return new Promise((resolve, reject) => {
+                    if (!img.dataset.src) {
+                        resolve();
+                        return;
+                    }
+
+                    const tempImage = new Image();
+                    
+                    tempImage.onload = () => {
+                        img.src = img.dataset.src;
+                        img.classList.add('loaded');
+                        loadedImages++;
+                        
+                        if (loadedImages === totalImages) {
+                            // 所有图片加载完成后显示网格
+                            loadingScreen.classList.add('fade-out');
+                            setTimeout(() => {
+                                loadingScreen.style.display = 'none';
+                                projectsGrid.classList.add('loaded');
+                                
+                                // 依次显示项目卡片
+                                projectItems.forEach((item, index) => {
+                                    setTimeout(() => {
+                                        item.classList.add('loaded');
+                                    }, index * 100);
+                                });
+                            }, 600);
+                        }
+                        resolve();
+                    };
+
+                    tempImage.onerror = reject;
+                    tempImage.src = img.dataset.src;
+                });
+            }
+
+            // 并行加载所有图片
+            Promise.all(Array.from(projectImages).map(img => loadImage(img)))
+                .catch(error => console.error('Error loading images:', error));
+
+            const header = document.querySelector('.header');
+            let lastScrollY = window.scrollY;
+            let isNearBottom = false;
+
+            // 检查是否接近底部
+            function checkIfNearBottom() {
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const threshold = 100; // 距离底部多少像素时触发
+
+                isNearBottom = (documentHeight - (scrollY + windowHeight)) < threshold;
+                
+                if (isNearBottom) {
+                    header.style.opacity = '0';
+                    header.style.pointerEvents = 'none';
+                } else {
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                    
+                    // 正常滚动时的header效果
+                    if (scrollY > 50) {
+                        header.classList.add('scrolled');
+                    } else {
+                        header.classList.remove('scrolled');
+                    }
+                }
+
+                lastScrollY = scrollY;
+            }
+
+            // 监听滚动事件
+            window.addEventListener('scroll', checkIfNearBottom);
+            // 监听窗口大小改变事件
+            window.addEventListener('resize', checkIfNearBottom);
+            // 初始检查
+            checkIfNearBottom();
+        });
+    </script>
+</body>
+</html> 
