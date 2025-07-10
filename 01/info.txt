@@ -1,0 +1,7 @@
+项目名称 Project：ARO酒吧
+类型 Type：餐饮空间
+面积 Area：70㎡
+地址：Location：浙江 杭州
+状态 Status：已完工
+设计师 Designer：贺宁 刘昕
+摄影师 photograph：wen 摄影，吕晓斌，谭啸

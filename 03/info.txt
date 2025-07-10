@@ -1,0 +1,7 @@
+项目名称 Project：Day Day Off
+类型 Type：餐饮空间
+面积 Area：164㎡
+地址：Location：浙江 杭州
+状态 Status：已完工
+设计师 Designer：贺宁
+摄影师 photograph：wen 摄影
