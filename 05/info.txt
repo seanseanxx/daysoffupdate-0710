@@ -1,0 +1,6 @@
+项目名称 Project：农场度假屋
+类型 Type：住宅
+面积 Area：270㎡
+地址：Location：河南 郑州
+状态 Status：施工中
+设计师 Designer：贺宁
